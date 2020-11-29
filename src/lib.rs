@@ -9,11 +9,19 @@ use wasm_bindgen::prelude::*;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-extern {
-    fn alert(s: &str);
+extern "C" {
+  fn alert(s: &str);
+  #[wasm_bindgen(js_namespace = console)]
+  fn log(s: &str);
 }
 
 #[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, wasm-2!");
+pub fn greet(name: &str) {
+  let cool = format!("when ur {}-ing really hard, so hard ur yolo'd", name);
+  alert(&cool);
+}
+
+#[wasm_bindgen]
+pub fn say_hello_from_rust() {
+  log("howdy... from rust");
 }

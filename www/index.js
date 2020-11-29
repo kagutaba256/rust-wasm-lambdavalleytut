@@ -1,3 +1,3 @@
-import * as wasm from "hello-wasm-pack";
+import * as rust from 'wasm-2'
 
-wasm.greet();
+rust.say_hello_from_rust()
