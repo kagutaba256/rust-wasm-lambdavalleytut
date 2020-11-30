@@ -31,6 +31,7 @@ pub struct Client {
   gl: GL,
   program_color_2d: programs::Color2D,
   program_color_2d_gradient: programs::Color2DGradient,
+  program_graph_3d: programs::Graph3D,
 }
 
 #[wasm_bindgen]
@@ -42,6 +43,7 @@ impl Client {
     Self {
       program_color_2d: programs::Color2D::new(&gl),
       program_color_2d_gradient: programs::Color2DGradient::new(&gl),
+      program_graph_3d: programs::Graph3D::new(&gl),
       gl: gl,
     }
   }
@@ -63,14 +65,25 @@ impl Client {
       curr_state.canvas_height,  //height
       curr_state.canvas_width,   //width
     );
-    self.program_color_2d_gradient.render(
-      &self.gl,                        //gl
-      curr_state.control_bottom + 20., //bottom
-      curr_state.control_top - 20.,    //top
-      curr_state.control_left + 20.,   //left
-      curr_state.control_right - 20.,  //right
-      curr_state.canvas_height,        //height
-      curr_state.canvas_width,         //width
+    // self.program_color_2d_gradient.render(
+    //   &self.gl,                        //gl
+    //   curr_state.control_bottom + 20., //bottom
+    //   curr_state.control_top - 20.,    //top
+    //   curr_state.control_left + 20.,   //left
+    //   curr_state.control_right - 20.,  //right
+    //   curr_state.canvas_height,        //height
+    //   curr_state.canvas_width,         //width
+    // );
+    self.program_graph_3d.render(
+      &self.gl,                  //gl
+      curr_state.control_bottom, //bottom
+      curr_state.control_top,    //top
+      curr_state.control_left,   //left
+      curr_state.control_right,  //right
+      curr_state.canvas_height,  //height
+      curr_state.canvas_width,   //width
+      0.5,                       //rotation x
+      0.5,                       //rotation y
     );
   }
 }
