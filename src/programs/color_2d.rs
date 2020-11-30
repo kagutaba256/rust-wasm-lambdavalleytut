@@ -4,6 +4,7 @@ use wasm_bindgen::JsCast;
 use web_sys::WebGlRenderingContext as GL;
 use web_sys::*;
 
+#[allow(dead_code)]
 pub struct Color2D {
   program: WebGlProgram,
   rect_vertice_ary_length: usize,
@@ -38,9 +39,14 @@ impl Color2D {
       vertices_location,
       vertices_location + vertices_rect.len() as u32,
     );
-    let buffer_rect = gl.create_buffer().ok_or("failed to create buffer").unwrap();
+    let buffer_rect =
+      gl.create_buffer().ok_or("failed to create buffer").unwrap();
     gl.bind_buffer(GL::ARRAY_BUFFER, Some(&buffer_rect));
-    gl.buffer_data_with_array_buffer_view(GL::ARRAY_BUFFER, &vert_array, GL::STATIC_DRAW);
+    gl.buffer_data_with_array_buffer_view(
+      GL::ARRAY_BUFFER,
+      &vert_array,
+      GL::STATIC_DRAW,
+    );
 
     Self {
       u_color: gl.get_uniform_location(&program, "uColor").unwrap(),
@@ -51,6 +57,7 @@ impl Color2D {
       program: program,
     }
   }
+  #[allow(dead_code)]
   pub fn render(
     &self,
     gl: &WebGlRenderingContext,
@@ -68,8 +75,8 @@ impl Color2D {
 
     gl.uniform4f(
       Some(&self.u_color),
-      0.031, //r
-      0.031, //g
+      0.021, //r
+      0.05,  //g
       0.031, //b
       1.0,   //a
     );
@@ -89,7 +96,11 @@ impl Color2D {
     );
 
     let transform_matrix = cf::mult_matrix_4(scale_matrix, translation_matrix);
-    gl.uniform_matrix4fv_with_f32_array(Some(&self.u_transform), false, &transform_matrix);
+    gl.uniform_matrix4fv_with_f32_array(
+      Some(&self.u_transform),
+      false,
+      &transform_matrix,
+    );
 
     gl.draw_arrays(GL::TRIANGLES, 0, (self.rect_vertice_ary_length / 2) as i32);
   }
