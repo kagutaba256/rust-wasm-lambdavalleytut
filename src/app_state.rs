@@ -2,7 +2,8 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 lazy_static! {
-  static ref APP_STATE: Mutex<Arc<AppState>> = Mutex::new(Arc::new(AppState::new()));
+  static ref APP_STATE: Mutex<Arc<AppState>> =
+    Mutex::new(Arc::new(AppState::new()));
 }
 
 pub fn update_dynamic_data(time: f32, canvas_height: f32, canvas_width: f32) {
@@ -59,7 +60,7 @@ impl AppState {
       mouse_down: false,
       mouse_x: -1.,
       mouse_y: -1.,
-      rotation_x_axis: 0.5,
+      rotation_x_axis: -0.5,
       rotation_y_axis: 0.5,
       time: 0.,
     }
@@ -71,7 +72,7 @@ pub fn update_mouse_down(x: f32, y: f32, is_down: bool) {
   *data = Arc::new(AppState {
     mouse_down: is_down,
     mouse_x: data.canvas_width - x,
-    mouse_y: y,
+    mouse_y: data.canvas_height - y,
     ..*data.clone()
   });
 }
@@ -79,8 +80,9 @@ pub fn update_mouse_down(x: f32, y: f32, is_down: bool) {
 pub fn update_mouse_position(x: f32, y: f32) {
   let mut data = APP_STATE.lock().unwrap();
   let inverted_x = data.canvas_width - x;
+  let inverted_y = data.canvas_height - y;
   let x_delta = inverted_x - data.mouse_x;
-  let y_delta = y - data.mouse_y;
+  let y_delta = inverted_y - data.mouse_y;
   let rotation_x_delta = if data.mouse_down {
     std::f32::consts::PI * y_delta / data.canvas_height
   } else {
@@ -94,7 +96,7 @@ pub fn update_mouse_position(x: f32, y: f32) {
 
   *data = Arc::new(AppState {
     mouse_x: inverted_x,
-    mouse_y: y,
+    mouse_y: inverted_y,
     rotation_x_axis: data.rotation_x_axis + rotation_x_delta,
     rotation_y_axis: data.rotation_y_axis - rotation_y_delta,
     ..*data.clone()

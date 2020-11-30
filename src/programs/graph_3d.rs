@@ -11,6 +11,7 @@ pub struct Graph3D {
   pub position_buffer: WebGlBuffer,
   pub u_opacity: WebGlUniformLocation,
   pub u_projection: WebGlUniformLocation,
+  pub y_buffer: WebGlBuffer,
 }
 
 impl Graph3D {
@@ -22,7 +23,10 @@ impl Graph3D {
     )
     .unwrap();
 
-    let positions_and_indices = cf::get_position_grid_n_by_n(10);
+    #[rustfmt::skip]
+    let positions_and_indices = cf::get_position_grid_n_by_n(
+      super::super::constants::GRID_SIZE
+    );
     let memory_buffer = wasm_bindgen::memory()
       .dyn_into::<WebAssembly::Memory>()
       .unwrap()
@@ -62,6 +66,7 @@ impl Graph3D {
       indices_buffer: buffer_indices,
       index_count: indices_array.length() as i32,
       position_buffer: buffer_position,
+      y_buffer: gl.create_buffer().ok_or("failed to create buffer").unwrap(),
     }
   }
 
@@ -76,6 +81,7 @@ impl Graph3D {
     canvas_width: f32,
     rotation_angle_x_axis: f32,
     rotation_angle_y_axis: f32,
+    y_vals: &Vec<f32>,
   ) {
     gl.use_program(Some(&self.program));
 
@@ -96,6 +102,19 @@ impl Graph3D {
     gl.bind_buffer(GL::ARRAY_BUFFER, Some(&self.position_buffer));
     gl.vertex_attrib_pointer_with_i32(0, 3, GL::FLOAT, false, 0, 0);
     gl.enable_vertex_attrib_array(0);
+
+    gl.bind_buffer(GL::ARRAY_BUFFER, Some(&self.y_buffer));
+    gl.vertex_attrib_pointer_with_i32(1, 1, GL::FLOAT, false, 0, 0);
+    gl.enable_vertex_attrib_array(1);
+
+    let y_memory_buffer = wasm_bindgen::memory()
+      .dyn_into::<WebAssembly::Memory>()
+      .unwrap()
+      .buffer();
+    let y_location = y_vals.as_ptr() as u32 / 4;
+    let y_array = js_sys::Float32Array::new(&y_memory_buffer)
+      .subarray(y_location, y_location + y_vals.len() as u32);
+    gl.buffer_data_with_array_buffer_view(GL::ARRAY_BUFFER, &y_array, GL::DYNAMIC_DRAW);
 
     gl.draw_elements_with_i32(GL::TRIANGLES, self.index_count, GL::UNSIGNED_SHORT, 0);
   }

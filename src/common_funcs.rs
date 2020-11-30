@@ -1,6 +1,28 @@
+use super::constants::*;
 use nalgebra::Perspective3;
 use web_sys::WebGlRenderingContext as GL;
 use web_sys::*;
+
+pub fn get_updated_3d_y_values(curr_time: f32) -> Vec<f32> {
+  let point_count_per_row = GRID_SIZE + 1;
+  let mut y_vals: Vec<f32> =
+    vec![0.; point_count_per_row * point_count_per_row];
+  let half_grid: f32 = point_count_per_row as f32 / 2.;
+  let frequency_scale: f32 = 3. * std::f32::consts::PI;
+  let y_scale = 0.15;
+
+  for z in 0..point_count_per_row {
+    for x in 0..point_count_per_row {
+      let use_y_index = z * point_count_per_row + x;
+      let scaled_x = frequency_scale * (x as f32 - half_grid) / half_grid;
+      let scaled_z = frequency_scale * (z as f32 - half_grid) / half_grid;
+      y_vals[use_y_index] =
+        y_scale * ((scaled_x * scaled_x + scaled_z * scaled_z).sqrt()).sin();
+    }
+  }
+
+  y_vals
+}
 
 pub fn get_3d_projection_matrix(
   bottom: f32,
@@ -12,16 +34,11 @@ pub fn get_3d_projection_matrix(
   rotation_angle_x_axis: f32,
   rotation_angle_y_axis: f32,
 ) -> [f32; 16] {
-  const FIELD_OF_VIEW: f32 = 45. * std::f32::consts::PI / 180.; // in radians
-  const Z_FAR: f32 = 100.;
-  const Z_NEAR: f32 = 0.1;
-  const Z_PLANE: f32 = -2.414213; // -1 / tan(pi/8)
-
   #[rustfmt::skip]
   let rotate_x_axis: [f32; 16] = [
     1., 0.,                          0.,                           0.,
     0., rotation_angle_x_axis.cos(), -rotation_angle_x_axis.sin(), 0.,
-    0., rotation_angle_x_axis.sin(), -rotation_angle_x_axis.cos(), 0.,
+    0., rotation_angle_x_axis.sin(), rotation_angle_x_axis.cos(), 0.,
     0., 0.,                          0.,                           1.,
   ];
 
@@ -74,7 +91,8 @@ pub fn get_position_grid_n_by_n(n: usize) -> (Vec<f32>, Vec<u16>) {
       if z < n && x < n {
         let start_index_i = 6 * (z * n + x);
         let vertex_index_top_left = (z * n_plus_one + x) as u16;
-        let vertex_index_bottom_left = vertex_index_top_left + n_plus_one as u16;
+        let vertex_index_bottom_left =
+          vertex_index_top_left + n_plus_one as u16;
         let vertex_index_top_right = vertex_index_top_left + 1;
         let vertex_index_bottom_right = vertex_index_bottom_left + 1;
 
@@ -100,8 +118,10 @@ pub fn link_program(
     .create_program()
     .ok_or_else(|| String::from("Error Creating Program"))?;
 
-  let vert_shader = compile_shader(&gl, GL::VERTEX_SHADER, vert_source).unwrap();
-  let frag_shader = compile_shader(&gl, GL::FRAGMENT_SHADER, frag_source).unwrap();
+  let vert_shader =
+    compile_shader(&gl, GL::VERTEX_SHADER, vert_source).unwrap();
+  let frag_shader =
+    compile_shader(&gl, GL::FRAGMENT_SHADER, frag_source).unwrap();
 
   gl.attach_shader(&program, &vert_shader);
   gl.attach_shader(&program, &frag_shader);
@@ -115,8 +135,9 @@ pub fn link_program(
     Ok(program)
   } else {
     Err(
-      gl.get_program_info_log(&program)
-        .unwrap_or_else(|| String::from("Unknown error creating program object")),
+      gl.get_program_info_log(&program).unwrap_or_else(|| {
+        String::from("Unknown error creating program object")
+      }),
     )
   }
 }

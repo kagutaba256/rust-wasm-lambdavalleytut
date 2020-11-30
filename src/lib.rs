@@ -9,6 +9,7 @@ extern crate lazy_static;
 
 mod app_state;
 mod common_funcs;
+mod constants;
 mod gl_setup;
 mod programs;
 mod shaders;
@@ -84,6 +85,7 @@ impl Client {
       curr_state.canvas_width,    //width
       curr_state.rotation_x_axis, //rotation x
       curr_state.rotation_y_axis, //rotation y
+      &common_funcs::get_updated_3d_y_values(curr_state.time),
     );
   }
 }

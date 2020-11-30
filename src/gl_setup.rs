@@ -25,7 +25,6 @@ pub fn initialize_webgl_context() -> Result<WebGlRenderingContext, JsValue> {
 
 fn attach_mouse_down_handler(canvas: &HtmlCanvasElement) -> Result<(), JsValue> {
   let handler = move |event: web_sys::MouseEvent| {
-    #[rustfmt::skip]
     super::app_state::update_mouse_down(
       event.client_x() as f32, 
       event.client_y() as f32, 
@@ -41,7 +40,6 @@ fn attach_mouse_down_handler(canvas: &HtmlCanvasElement) -> Result<(), JsValue> 
 
 fn attach_mouse_up_handler(canvas: &HtmlCanvasElement) -> Result<(), JsValue> {
   let handler = move |event: web_sys::MouseEvent| {
-    #[rustfmt::skip]
     super::app_state::update_mouse_down(
       event.client_x() as f32, 
       event.client_y() as f32, 
