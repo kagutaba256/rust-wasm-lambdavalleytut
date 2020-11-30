@@ -75,15 +75,15 @@ impl Client {
     //   curr_state.canvas_width,         //width
     // );
     self.program_graph_3d.render(
-      &self.gl,                  //gl
-      curr_state.control_bottom, //bottom
-      curr_state.control_top,    //top
-      curr_state.control_left,   //left
-      curr_state.control_right,  //right
-      curr_state.canvas_height,  //height
-      curr_state.canvas_width,   //width
-      0.5,                       //rotation x
-      0.5,                       //rotation y
+      &self.gl,                   //gl
+      curr_state.control_bottom,  //bottom
+      curr_state.control_top,     //top
+      curr_state.control_left,    //left
+      curr_state.control_right,   //right
+      curr_state.canvas_height,   //height
+      curr_state.canvas_width,    //width
+      curr_state.rotation_x_axis, //rotation x
+      curr_state.rotation_y_axis, //rotation y
     );
   }
 }
