@@ -30,6 +30,7 @@ extern "C" {
 pub struct Client {
   gl: GL,
   program_color_2d: programs::Color2D,
+  program_color_2d_gradient: programs::Color2DGradient,
 }
 
 #[wasm_bindgen]
@@ -40,6 +41,7 @@ impl Client {
     let gl = gl_setup::initialize_webgl_context().unwrap();
     Self {
       program_color_2d: programs::Color2D::new(&gl),
+      program_color_2d_gradient: programs::Color2DGradient::new(&gl),
       gl: gl,
     }
   }
@@ -53,13 +55,22 @@ impl Client {
     self.gl.clear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT);
     let curr_state = app_state::get_curr_state();
     self.program_color_2d.render(
-      &self.gl, //gl
-      0.,       //bottom
-      100.,     //top
-      0.,       //left
-      100.,     //right
-      curr_state.canvas_height,
-      curr_state.canvas_width,
+      &self.gl,                  //gl
+      curr_state.control_bottom, //bottom
+      curr_state.control_top,    //top
+      curr_state.control_left,   //left
+      curr_state.control_right,  //right
+      curr_state.canvas_height,  //height
+      curr_state.canvas_width,   //width
+    );
+    self.program_color_2d_gradient.render(
+      &self.gl,                        //gl
+      curr_state.control_bottom + 20., //bottom
+      curr_state.control_top - 20.,    //top
+      curr_state.control_left + 20.,   //left
+      curr_state.control_right - 20.,  //right
+      curr_state.canvas_height,        //height
+      curr_state.canvas_width,         //width
     );
   }
 }
