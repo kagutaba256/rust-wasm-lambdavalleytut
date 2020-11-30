@@ -68,8 +68,8 @@ impl Color2D {
 
     gl.uniform4f(
       Some(&self.u_color),
-      0.,  //r
-      0.5, //g
+      0.5, //r
+      0.0, //g
       0.5, //b
       1.0, //a
     );

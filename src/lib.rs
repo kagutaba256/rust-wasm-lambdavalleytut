@@ -4,6 +4,10 @@ use wasm_bindgen::prelude::*;
 use web_sys::WebGlRenderingContext as GL;
 use web_sys::*;
 
+#[macro_use]
+extern crate lazy_static;
+
+mod app_state;
 mod common_funcs;
 mod gl_setup;
 mod programs;
@@ -40,20 +44,22 @@ impl Client {
     }
   }
 
-  pub fn update(&mut self, _time: f32, _height: f32, _width: f32) -> Result<(), JsValue> {
+  pub fn update(&mut self, time: f32, height: f32, width: f32) -> Result<(), JsValue> {
+    app_state::update_dynamic_data(time, height, width);
     Ok(())
   }
 
   pub fn render(&self) {
     self.gl.clear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT);
+    let curr_state = app_state::get_curr_state();
     self.program_color_2d.render(
       &self.gl, //gl
       0.,       //bottom
-      10.,      //top
+      100.,     //top
       0.,       //left
-      10.,      //right
-      10.,      //canvas_height
-      10.,      //canvas_width
+      100.,     //right
+      curr_state.canvas_height,
+      curr_state.canvas_width,
     );
   }
 }
